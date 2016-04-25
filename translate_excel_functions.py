@@ -6,6 +6,7 @@ __license__ = "MIT"
 __version__ = "1.0.1"
 __email__ = "pemryd@gmail.com"
 
+import re
 import requests
 from bs4 import BeautifulSoup
 
@@ -59,30 +60,40 @@ soup = BeautifulSoup(r.content, "html.parser")
 # Create dict and enumerate over table values
 tdict = dict((i,t) for i,t in enumerate(soup.find_all('td'))) 
 
-# Remove "=" and split parts into list
-function = function.replace('=','').split('(')
+# Remove "=" and split elements into list
+# spfunction keeps the delimiters, which are used when the final output is joined
+# function filters out delimiters
+
+function = function.replace('=','')
+
+spfunction = re.split('(\W)', function)
+
+#function = list(filter(None, re.split(r'[,;()&]+', function)))
+function = list(filter(None, re.split(r'[\W]+', function)))
 
 # Iterate over table values, function parts
 # Add original and translated values to dict
 trdict = {}
-for i, t in tdict.items(): 
-     for x in function:
-          if(str(x) in str(t.getText())):
-               if(langf == "en"): 
-                    fr = (tdict[i+1].getText().split(','))[0]
-                    to = (t.getText().split(','))[0]
-                    trdict[to] = fr # If translating from English, set key to English
-               else: 
-                    fr = (t.getText().split(','))[0]
-                    to = (tdict[i+1].getText().split(','))[0]
-                    trdict[fr] = to # If translating from non-English, set key to non-English
+#for i, t in tdict.items():
+for i, t in tdict.items():
+    for x in function:
+         if(str(x) in str(t.getText())):
+              if(langf == "en"):
+                   if(t.getText() not in trdict.keys()):
+                       fr = (tdict[i+1].getText().split(','))[0]
+                       to = (t.getText().split(','))[0]
+                       trdict[to] = fr # If translating from English, set key to English
+              else: 
+                   fr = (t.getText().split(','))[0]
+                   to = (tdict[i+1].getText().split(','))[0]
+                   trdict[fr] = to # If translating from non-English, set key to non-English
 
 
-new = [trdict.get(x,x) for x in function] # Get translated value from dict
+new = [trdict.get(x,x) for x in spfunction] # Get translated value from dict
+
 if(langf != "en"):
-     new = '=' + '('.join(new).replace(';',',')
+     new = '=' + ''.join(new).replace(';',',')
 elif(langf == "en"):
-     new = '=' + '('.join(new).replace(',',';')
+     new = '=' + ''.join(new).replace(',',';')
 
 print("\n%s"%new)
-
