@@ -11,7 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 
 avail_lang = {
-'ce':["cestina","czech"],
+'cz':["cestina","czech"],
 'dk':["dansk","danish"],
 'nl':["nederlands","dutch"],
 'en':["english","english"],
@@ -20,10 +20,10 @@ avail_lang = {
 'it':["italiano","italian"],
 'pl':["jezyk-polski","polish"],
 'no':["norsk","norwegian"],
-'su':["suomi","finnish"],
-'ma':["magyar","hungarian"],
-'pg':["portugues","portugese"],
-'pb':["portugues-brasileiro","brazilian-portuguese"],
+'fi':["suomi","finnish"],
+'hu':["magyar","hungarian"],
+'po':["portugues","portugese"],
+'bp':["portugues-brasileiro","brazilian-portuguese"],
 'sv':["svenska","swedish"]}
 
 print("Available languages:\tCode:\n")
@@ -63,8 +63,9 @@ tdict = dict((i,t) for i,t in enumerate(soup.find_all('td')))
 # Get rid of '=' for now
 function = function.replace('=','')
 
-# Split by and keep the delimiters, which are used when the final output is joined
-spfunction = re.split('(\W)', function)
+# Split by and keep any non-alphanumeric delimiter (except .)
+# the full string including delimters is added at the end
+spfunction = re.split('([^\\w.])', function)
 
 # Split by and remove delimiters, filter out empty elements
 function = list(filter(None, re.split(r'[\W]+', function)))
