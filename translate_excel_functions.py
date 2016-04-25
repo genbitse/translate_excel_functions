@@ -60,16 +60,17 @@ soup = BeautifulSoup(r.content, "html.parser")
 # Create dict and enumerate over table values
 tdict = dict((i,t) for i,t in enumerate(soup.find_all('td'))) 
 
-# Remove "=" and split elements into list
-# spfunction keeps the delimiters, which are used when the final output is joined
-# function filters out delimiters
-
+# Get rid of '=' for now
 function = function.replace('=','')
 
+# Split by and keep the delimiters, which are used when the final output is joined
 spfunction = re.split('(\W)', function)
 
-#function = list(filter(None, re.split(r'[,;()&]+', function)))
+# Split by and remove delimiters, filter out empty elements
 function = list(filter(None, re.split(r'[\W]+', function)))
+
+# Only keep elements longer than 2 chars, in order to limit matching
+function = [f for f in function if len(f) > 2]
 
 # Iterate over table values, function parts
 # Add original and translated values to dict
@@ -79,7 +80,7 @@ for i, t in tdict.items():
     for x in function:
          if(str(x) in str(t.getText())):
               if(langf == "en"):
-                   if(t.getText() not in trdict.keys()):
+                   if(t.getText() not in trdict.keys()): # Prevent duplicates
                        fr = (tdict[i+1].getText().split(','))[0]
                        to = (t.getText().split(','))[0]
                        trdict[to] = fr # If translating from English, set key to English
