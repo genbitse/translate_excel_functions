@@ -60,9 +60,6 @@ soup = BeautifulSoup(r.content, "html.parser")
 # Create dict and enumerate over table values
 tdict = dict((i,t) for i,t in enumerate(soup.find_all('td'))) 
 
-# Get rid of '=' for now
-function = function.replace('=','')
-
 # Split by and keep any non-alphanumeric delimiter (except .)
 # the full string including delimters is added at the end
 spfunction = re.split('([^\\w.])', function)
